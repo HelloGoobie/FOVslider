@@ -102,7 +102,6 @@
         }
     </style>
     <script>
-        let inVehicleErrorShown = false;
         let isDragging = false;
 
         function appendToConsole(message) {
@@ -114,16 +113,6 @@
         }
 
         function sendFOVCommand(value) {
-            // Check if the user is in a spawned vehicle
-            if (!window.vehicleData || window.vehicleData.modelName === "onFoot") {
-                if (!inVehicleErrorShown) {
-                    appendToConsole("Error: You must be in a spawned vehicle to adjust the FOV.");
-                    inVehicleErrorShown = true;
-                }
-                return;
-            }
-            inVehicleErrorShown = false;
-
             try {
                 // Construct the command object
                 const command = {
@@ -139,8 +128,7 @@
                 if (typeof window.sendGameCommand === 'function') {
                     window.sendGameCommand(command);
                 } else {
-                    console.warn("sendGameCommand function is not available.");
-                    appendToConsole("Warning: sendGameCommand function is not available.");
+                    console.error("sendGameCommand function is not available.");
                 }
             } catch (error) {
                 appendToConsole(`Error: ${error.message}`);
@@ -184,14 +172,6 @@
             const headerElement = document.querySelector('.console-header');
             consoleElement.classList.toggle('active');
             headerElement.classList.toggle('active');
-        }
-
-        // Mock sendGameCommand for testing if not available
-        if (typeof window.sendGameCommand !== 'function') {
-            window.sendGameCommand = (command) => {
-                console.log("Mock sendGameCommand called with:", command);
-                appendToConsole(`Mock command sent: ${command.command}`);
-            };
         }
 
         document.addEventListener('DOMContentLoaded', makeWindowDraggable);
