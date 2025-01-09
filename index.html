@@ -11,6 +11,8 @@
             padding: 0;
             background-color: transparent;
             overflow: hidden;
+            // Implement the actual sending of the command here
+            console.log(command);
         }
 
         .window {
@@ -29,7 +31,8 @@
         .slider-container {
             margin: 20px 0;
         }
-
+            -webkit-appearance: none;
+            appearance: none;
         .slider {
             -webkit-appearance: none;
             width: 100%;
@@ -59,86 +62,20 @@
             color: #fff;
             margin-top: 10px;
         }
-
-        .console-container {
-            margin-top: 20px;
-        }
-
-        .console-header {
-            font-size: 16px;
-            color: #ff4d4d;
-            cursor: pointer;
-            user-select: none;
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-        }
-
-        .console-header::before {
-            content: '\25BC';
-            margin-right: 10px;
-            transition: transform 0.3s ease;
-        }
-
-        .console-header.active::before {
-            transform: rotate(180deg);
-        }
-
-        .console {
-            display: none;
-            padding: 10px;
-            border: 1px solid #ff4d4d;
-            background-color: #1a1a1a;
-            text-align: left;
-            font-size: 14px;
-            height: 100px;
-            overflow-y: auto;
-            color: #fff;
-            border-radius: 8px;
-        }
-
-        .console.active {
-            display: block;
-        }
     </style>
     <script>
         let isDragging = false;
 
-        function appendToConsole(message) {
-            const consoleElement = document.getElementById('console');
-            const newMessage = document.createElement('div');
-            newMessage.textContent = message;
-            consoleElement.appendChild(newMessage);
-            consoleElement.scrollTop = consoleElement.scrollHeight;
-        }
-
         function sendFOVCommand(value) {
-            try {
-                // Construct the command object
-                const command = {
-                    type: "sendCommand",
-                    command: `cam_vehicleFirstPersonFOV ${value}`
-                };
-
-                // Debug: Log the command being sent
-                console.log("Sending FOV Command:", command);
-                appendToConsole(`Sending command: ${command.command}`);
-
-                // Send the command to the game client
-                if (typeof window.sendGameCommand === 'function') {
-                    window.sendGameCommand(command);
-                } else {
-                    console.error("sendGameCommand function is not available.");
-                }
-            } catch (error) {
-                appendToConsole(`Error: ${error.message}`);
-            }
+            const command = {
+                type: "sendCommand",
+                command: `cam_vehicleFirstPersonFOV ${value}`
+            };
         }
 
         function updateSliderValue(slider) {
             const value = slider.value;
             document.getElementById('valueDisplay').textContent = `Current FOV: ${value}`;
-            console.log("Slider value updated:", value); // Debug: Log slider updates
             sendFOVCommand(value);
         }
 
@@ -147,7 +84,6 @@
             let offsetX, offsetY;
 
             windowElement.addEventListener('mousedown', (e) => {
-                // Prevent dragging when interacting with slider
                 if (e.target.classList.contains('slider')) return;
 
                 isDragging = true;
@@ -167,13 +103,6 @@
             });
         }
 
-        function toggleConsole() {
-            const consoleElement = document.getElementById('console');
-            const headerElement = document.querySelector('.console-header');
-            consoleElement.classList.toggle('active');
-            headerElement.classList.toggle('active');
-        }
-
         document.addEventListener('DOMContentLoaded', makeWindowDraggable);
     </script>
 </head>
@@ -191,10 +120,6 @@
                 oninput="updateSliderValue(this)"
             >
             <div id="valueDisplay" class="value-display">Current FOV: 50</div>
-        </div>
-        <div class="console-container">
-            <div class="console-header" onclick="toggleConsole()">Error Console</div>
-            <div id="console" class="console"></div>
         </div>
     </div>
 </body>
